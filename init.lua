@@ -1,11 +1,24 @@
-require("Tools")
+-- einstellungen die als erstes auszuführen sind um fehler zu vermeiden
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.o.jit = true
 
---funny rust lsp work around
-local old_notify = vim.notify
-local silence_pat = '[lspconfig] cmd ("cargo'
-vim.notify = function(msg, level, opts)
-	if (string.sub(msg, 1, string.len(silence_pat)) ~= silence_pat)
-	then
-		old_notify(msg, level, opts)
-	end
+-- installiert lazyvim wenn nicht vorhanden.
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
 end
+vim.opt.rtp:prepend(lazypath)
+
+-- greift auf dem plugins ordner für weitere configuration zu
+require("lazy").setup("plugins")
+require("config")
